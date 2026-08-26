@@ -4,9 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Happy Birthday</title>
+<!-- Google Fonts: Dancing Script & Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --accent:#ff5f96;
+    --accent:#ff2e7e;
     --accent-dark:#c22a63;
     --gold:#ffd36e;
     --text-light:#f4eefc;
@@ -16,13 +21,13 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{
     margin:0; padding:0; height:100%;
-    font-family:'Segoe UI', Tahoma, Verdana, sans-serif;
+    font-family:'Poppins', sans-serif;
     background:#0f0c22;
     color:var(--text-light);
     overflow:hidden;
   }
 
-  /* ============ persistent background ============ */
+  /* ============ Persistent Background ============ */
   #bg{
     position:fixed; inset:0; z-index:0;
     background:linear-gradient(180deg,#241d47 0%, #473a72 40%, #6b5a9e 70%, #b895ac 100%);
@@ -45,10 +50,6 @@
     will-change:transform, opacity;
     transform:translate3d(0,0,0);
   }
-  .bubble.balloon{
-    border:none; font-size:26px; line-height:1;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.35));
-  }
   @keyframes float-up{
     0%{ transform:translate3d(0,0,0) rotate(0deg); opacity:0; }
     8%{ opacity:0.8; }
@@ -56,7 +57,7 @@
     100%{ transform:translate3d(var(--drift,20px),-118vh,0) rotate(8deg); opacity:0; }
   }
 
-  /* ============ stage & scenes ============ */
+  /* ============ Stage & Scenes ============ */
   #stage{ position:fixed; inset:0; z-index:1; }
   .scene{
     position:absolute; inset:0;
@@ -71,125 +72,149 @@
   }
   .scene.active{ opacity:1; pointer-events:auto; transform:scale(1) translateY(0); }
 
-  /* ---- scene: envelope ---- */
-  .envelope{
-    width:150px; height:112px; position:relative; cursor:pointer;
-    filter:drop-shadow(0 0 25px rgba(255,95,150,0.55));
-    animation:bob 3.4s ease-in-out infinite, env-intro 0.8s var(--ease) both;
-    margin-bottom:30px;
-    perspective:600px;
+  /* ---- Scene 1: Envelope ---- */
+  .envlope-wrapper{
+    position: relative;
+    cursor: pointer;
+    animation: bob 3.4s ease-in-out infinite, env-intro 0.8s var(--ease) both;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1000px;
   }
   @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
   @keyframes env-intro{ 0%{ opacity:0; transform:scale(0.75) translateY(24px);} 100%{ opacity:1; transform:scale(1) translateY(0);} }
-  
-  .envelope .body{ position:absolute; inset:0; background:linear-gradient(180deg,#fff0f4,#ffd6e4); border-radius:9px; }
-  .envelope .flap{
-    position:absolute; top:0; left:0; width:100%; height:60%;
-    background:linear-gradient(135deg,#ff5f96,#e0356f);
-    clip-path:polygon(0 0,100% 0,50% 100%);
-    border-radius:9px 9px 0 0;
-    transform-origin:top; transform-style:preserve-3d;
-    transition:transform 0.8s cubic-bezier(.4, 0, .2, 1);
+
+  #envelope{
+    width: 290px;
+    height: 185px;
+    position: relative;
+    background: #ffb3c6;
+    border-radius: 8px 8px 12px 12px;
+    box-shadow: 0 12px 30px rgba(255,46,126,0.35);
+    transform-style: preserve-3d;
   }
-  .envelope.open .flap{ transform:rotateX(180deg); }
-  .envelope .heart-mid{ position:absolute; top:54%; left:50%; transform:translate(-50%,-50%); font-size:30px; }
-  .envelope .heart-l{ position:absolute; bottom:14px; left:26px; font-size:17px; }
-  .envelope .heart-r{ position:absolute; bottom:14px; right:26px; font-size:17px; }
+  #envelope.close .front.flap{
+    transform: rotateX(0deg);
+    transition: transform 0.5s ease, z-index 0.5s;
+    z-index: 10;
+  }
+  #envelope.open .front.flap{
+    transform: rotateX(180deg);
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+    z-index: 1;
+  }
+  #envelope .front{
+    position: absolute;
+    width: 0; height: 0;
+    z-index: 3;
+  }
+  #envelope .front.flap{
+    border-left: 145px solid transparent;
+    border-right: 145px solid transparent;
+    border-top: 110px solid #ff2e7e;
+    top: 0; left: 0;
+    transform-origin: top;
+    pointer-events: none;
+    backface-visibility: hidden;
+  }
+  #envelope.open .letter{
+    transform: translateY(-90px) scale(1);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+    z-index: 5;
+  }
+  #envelope .front.pocket{
+    border-left: 145px solid #ffa3b8;
+    border-right: 145px solid #ffa3b8;
+    border-bottom: 98px solid #ff809c;
+    border-top: 87px solid transparent;
+    bottom: 0; left: 0;
+    border-radius: 0 0 12px 12px;
+  }
+  #envelope .letter{
+    position: absolute;
+    background: #ffffff;
+    width: 88%;
+    height: 85%;
+    top: 7%;
+    left: 6%;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 15px;
+    transform: translateY(0) scale(0.95);
+    transition: transform 0.5s ease;
+  }
+  #envelope .letter .message p{
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: #d81b60;
+    font-size: 1.55rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .seal-heart {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    background: #e0115f;
+    transform: translate(-50%, -50%) rotate(45deg);
+    z-index: 11;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    transition: opacity 0.3s ease;
+  }
+  .seal-heart::before, .seal-heart::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #e0115f;
+    border-radius: 50%;
+  }
+  .seal-heart::before { top: -15px; left: 0; }
+  .seal-heart::after { top: 0; left: -15px; }
+
+  #envelope.open .seal-heart { opacity: 0; }
+
+  .hearts { position: absolute; inset: 0; pointer-events: none; z-index: 11; }
+  .heart {
+    position: absolute; width: 15px; height: 15px; background: #ff2e7e;
+    transform: rotate(45deg); opacity: 0;
+  }
+  .heart::before, .heart::after {
+    content: ''; position: absolute; width: 15px; height: 15px; background: #ff2e7e; border-radius: 50%;
+  }
+  .heart::before { top: -7.5px; left: 0; }
+  .heart::after { top: 0; left: -7.5px; }
+  .heart.a1 { top: -10px; left: -20px; animation: hb 1.5s infinite; }
+  .heart.a2 { top: -20px; right: -20px; animation: hb 1.8s infinite 0.3s; }
+  .heart.a3 { bottom: 10px; left: -25px; animation: hb 1.2s infinite 0.6s; }
+  @keyframes hb { 0%,100%{transform: scale(0.8) rotate(45deg); opacity:0.7;} 50%{transform: scale(1.25) rotate(45deg); opacity:1;} }
 
   .open-btn{
-    font-family:inherit; font-weight:700; font-size:1.05rem;
-    color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-dark));
-    border:none; padding:14px 34px; border-radius:999px;
-    box-shadow:0 8px 24px rgba(255,60,120,0.45); cursor:pointer;
-    display:flex; align-items:center; gap:10px;
-    transition:transform 0.25s var(--ease), opacity 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600; font-size: 1rem;
+    color: #ffffff;
+    background: #d81b60;
+    border: 2px solid #ffffff;
+    padding: 8px 28px; border-radius: 999px;
+    box-shadow: 0 6px 20px rgba(216, 27, 96, 0.45); cursor: pointer;
+    display: flex; align-items: center; gap: 8px; margin-top: 15px;
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
   }
-  .open-btn:active{ transform:scale(0.94); }
+  .open-btn:active{ transform: scale(0.94); }
 
-  /* ---- scene: letter popping out ---- */
-  .letter-wrap{ position:relative; width:180px; height:210px; max-width:62vw; }
-
-  .letter-paper{
-    position:absolute; top:0; left:50%; width:78%;
-    min-height:132px;
-    transform:translateX(-50%) rotate(-3deg) translateY(46px);
-    opacity:0;
-    background:linear-gradient(180deg,#fffdf9,#fff2e8);
-    border-radius:7px 12px 12px 12px;
-    padding:16px 12px 52px 14px;
-    box-shadow:0 10px 22px rgba(0,0,0,0.28), 0 0 18px rgba(255,120,170,0.35);
-    z-index:1;
-    animation:paper-rise 1.1s cubic-bezier(.22,1.1,.36,1) 0.05s forwards;
-    font-family:'Segoe Script','Brush Script MT',cursive;
-    color:#c22a63; font-size:0.95rem; line-height:1.4;
-    text-align:left;
-    will-change:transform, opacity;
-  }
-  .letter-paper::before{
-    content:""; position:absolute; top:9px; left:9px; width:10px; height:10px;
-    border-top:2px solid #d9578c; border-left:2px solid #d9578c;
-    opacity:0.55;
-  }
-  @keyframes paper-rise{
-    0%{ transform:translateX(-50%) rotate(-3deg) translateY(46px); opacity:0; }
-    65%{ transform:translateX(-50%) rotate(-3deg) translateY(-6px); opacity:1; }
-    100%{ transform:translateX(-50%) rotate(-3deg) translateY(0); opacity:1; }
-  }
-
-  .env-pocket{
-    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
-    width:88%; height:106px; z-index:2;
-  }
-  .env-pocket .flap-shape{
-    position:absolute; inset:0;
-    background:linear-gradient(180deg,#fff0f4,#ffd0e0);
-    clip-path:polygon(0 0,50% 44%,100% 0,100% 100%,0 100%);
-    border-radius:0 0 10px 10px;
-    box-shadow:0 8px 18px rgba(0,0,0,0.25);
-  }
-  .env-pocket .big-heart{
-    position:absolute; top:38%; left:50%; font-size:2rem;
-    transform:translate(-50%,-50%) scale(0);
-    z-index:3; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.35));
-    animation:heart-pop 0.55s var(--ease) 0.75s forwards;
-  }
-  @keyframes heart-pop{
-    0%{ transform:translate(-50%,-50%) scale(0); }
-    65%{ transform:translate(-50%,-50%) scale(1.2); }
-    100%{ transform:translate(-50%,-50%) scale(1); }
-  }
-
-  .deco-heart{
-    position:absolute; font-size:2rem; z-index:2;
-    opacity:0; transform:scale(0.3) rotate(-12deg);
-    filter:drop-shadow(0 0 12px rgba(255,60,110,0.85));
-    animation:deco-pop 0.5s var(--ease) forwards, deco-glow 1.6s ease-in-out 0.6s infinite;
-  }
-  @keyframes deco-pop{
-    0%{ opacity:0; transform:scale(0.3) rotate(-12deg); }
-    70%{ opacity:1; transform:scale(1.25) rotate(4deg); }
-    100%{ opacity:1; transform:scale(1) rotate(0deg); }
-  }
-  @keyframes deco-glow{
-    0%,100%{ filter:drop-shadow(0 0 10px rgba(255,60,110,0.7)); }
-    50%{ filter:drop-shadow(0 0 20px rgba(255,90,140,1)); }
-  }
-
-  .flying-heart{
-    position:absolute; font-size:18px; opacity:0;
-    animation:heart-fly 1.8s var(--ease) forwards;
-    pointer-events:none; z-index:4;
-    will-change:transform, opacity;
-  }
-  @keyframes heart-fly{
-    0%{ opacity:0; transform:translateY(0) scale(0.5); }
-    18%{ opacity:1; }
-    100%{ opacity:0; transform:translateY(-110px) scale(1.05); }
-  }
-
-  /* ---- scene: photo reveal ---- */
+  /* ---- Scene 2: Photo Reveal ---- */
   .photo-frame{
-    width:170px; height:170px; border-radius:50%;
+    width:180px; height:180px; border-radius:50%;
     background:#eaeaea; position:relative;
     border:6px solid #fff;
     box-shadow:0 0 30px rgba(255,120,180,0.7);
@@ -199,99 +224,111 @@
   }
   @keyframes pop-in{ 0%{ transform:scale(0.55); opacity:0;} 100%{ transform:scale(1); opacity:1;} }
   .photo-frame img{ width:100%; height:100%; object-fit:cover; }
-  .photo-frame .placeholder{ font-weight:700; color:#333; font-size:0.95rem; line-height:1.3; }
-  .wreath-leaf{ position:absolute; font-size:15px; }
   .photo-caption{
     margin-top:22px;
-    font-family:'Segoe Script','Brush Script MT',cursive;
-    font-size:2rem; color:var(--text-light);
+    font-family: 'Dancing Script', cursive;
+    font-size:2.3rem; color:var(--text-light);
     text-shadow:0 0 16px rgba(255,150,190,0.8);
     transform:rotate(-4deg) translateY(8px);
     opacity:0; animation:cap-fade 1s var(--ease) 0.4s forwards;
   }
   @keyframes cap-fade{ to{ opacity:1; transform:rotate(-4deg) translateY(0); } }
 
-  /* ---- scene: card ---- */
-  .card-scene{ justify-content:flex-start; padding-top:9vh; }
+  /* ---- Scene 3: Card ---- */
+  .card-scene{ justify-content:flex-start; padding-top:8vh; }
   .card{
-    width:100%; max-width:400px;
-    background:rgba(50,42,80,0.55);
-    backdrop-filter:blur(6px);
+    width:100%; max-width:390px;
+    background:rgba(50,42,80,0.60);
+    backdrop-filter:blur(8px);
     border:2px solid rgba(255,255,255,0.9);
     border-radius:22px;
-    padding:26px 22px 26px;
+    padding:24px 20px;
     box-shadow:0 0 40px rgba(255,120,180,0.25);
     transition:opacity 0.6s var(--ease), filter 0.6s var(--ease), transform 0.6s var(--ease);
-    will-change:opacity, transform, filter;
   }
-  .card.dim{ opacity:0.22; filter:blur(4px); transform:scale(0.95); }
 
   .avatar-circle{
-    width:96px; height:96px; border-radius:50%; margin:0 auto 16px;
+    width:90px; height:90px; border-radius:50%; margin:0 auto 14px;
     border:4px solid rgba(255,255,255,0.9);
     box-shadow:0 0 25px rgba(255,120,180,0.6);
     position:relative; overflow:hidden;
     background:linear-gradient(160deg,#efe6f5,#dcc9e6);
     display:flex; align-items:center; justify-content:center;
   }
-  .avatar-circle img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  .avatar-circle .badge{
-    position:absolute; bottom:-2px; right:-2px; font-size:20px;
-    filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4));
-  }
-  .avatar-circle .placeholder-txt{
-    font-size:0.68rem; font-weight:700; color:#6b5a86; text-align:center; line-height:1.25; padding:0 8px;
-  }
+  .avatar-circle img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  .title-line{ font-size:1.22rem; font-weight:800; margin:0 0 12px; text-align:left; min-height:1.4em; }
-  .title-line em{ color:var(--gold); font-style:italic; }
+  .title-line{ font-size:1.2rem; font-weight:700; margin:0 0 12px; text-align:left; min-height:1.4em; }
+  .title-line em{ color:var(--gold); font-style:normal; }
 
   .msg-box{
-    text-align:left; font-size:1rem; line-height:1.62;
-    max-height:34vh; overflow-y:auto; scrollbar-width:none;
-    scroll-behavior:auto;
+    text-align:left; font-size:0.95rem; line-height:1.6;
+    max-height:36vh; overflow-y:auto; scrollbar-width:none;
   }
   .msg-box::-webkit-scrollbar{ display:none; }
-  .msg-box p{ margin:0 0 14px; white-space:pre-wrap; }
+  .msg-box p{ margin:0 0 12px; white-space:pre-wrap; }
   .msg-box p.closing{ font-weight:700; font-style:italic; }
   .cursor{ display:inline-block; width:2px; height:1em; background:var(--text-light); margin-left:2px; vertical-align:-0.15em; animation:blink 0.9s steps(1) infinite; }
   @keyframes blink{ 50%{ opacity:0; } }
 
-  /* ---- finale overlay ---- */
+  /* ---- Finale Overlay ---- */
   #finale{
-    position:fixed; inset:0; z-index:5;
+    position:fixed; inset:0; z-index:10;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:22px; background:rgba(6,4,16,0.88);
+    gap:20px; background:rgba(6,4,16,0.92);
     opacity:0; pointer-events:none;
     transition:opacity 0.8s var(--ease);
-    will-change:opacity;
   }
-  #finale.show{ opacity:1; }
+  #finale.show{ opacity:1; pointer-events:auto; }
+  
   .cake-frame{
-    border:3px solid #fff; border-radius:16px; padding:16px 22px;
+    border:3px solid #fff; border-radius:16px; padding:12px;
     background:#0b0b0b; box-shadow:0 0 40px rgba(255,120,180,0.6);
     transform:scale(0.5); transition:transform 0.8s var(--ease);
-    will-change:transform;
+    width: 200px; height: auto; object-fit: cover;
   }
   #finale.show .cake-frame{ transform:scale(1); }
-  .candles{ font-size:2rem; letter-spacing:1px; }
-  .hbd-word{ font-weight:800; font-size:1.15rem; margin-top:8px; letter-spacing:1px; }
+  
+  .hbd-word{ font-weight:800; font-size:1.15rem; margin-top:6px; letter-spacing:1px; }
   .hbd-word span{ display:inline-block; }
   .hbd-word span:nth-child(4n+1){color:#ff5f96;} .hbd-word span:nth-child(4n+2){color:#ffd36e;}
   .hbd-word span:nth-child(4n+3){color:#7ee0a8;} .hbd-word span:nth-child(4n){color:#ff8f5f;}
+  
   .wish-text{
-    font-family:'Segoe Script','Brush Script MT',cursive;
-    font-size:2.1rem; color:#f4eefc;
+    font-family: 'Dancing Script', cursive;
+    font-size:2.2rem; color:#f4eefc;
     text-shadow:0 0 18px rgba(255,150,190,0.85);
     opacity:0; transform:translateY(12px);
     transition:opacity 0.7s var(--ease) 0.35s, transform 0.7s var(--ease) 0.35s;
   }
   #finale.show .wish-text{ opacity:1; transform:translateY(0); }
 
+  /* Tombol Silang (X) */
+  .close-btn {
+    position: absolute;
+    top: 22px;
+    right: 22px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: background 0.3s ease, transform 0.2s ease;
+    z-index: 12;
+  }
+  .close-btn:hover { background: rgba(255, 46, 126, 0.6); }
+  .close-btn:active { transform: scale(0.9); }
+
   @media (prefers-reduced-motion: reduce){
-    .bubble, .envelope{ animation:none !important; }
+    .bubble, .envlope-wrapper{ animation:none !important; }
   }
 </style>
 </head>
@@ -303,33 +340,29 @@
 
 <div id="stage">
 
-  <!-- SCENE 1 : envelope -->
+  <!-- SCENE 1 : Envelope -->
   <section class="scene active" id="scene-envelope">
-    <div class="envelope" id="envelope">
-      <div class="body"></div>
-      <div class="flap"></div>
-      <div class="heart-mid">❤️</div>
-      <div class="heart-l">❤️</div>
-      <div class="heart-r">❤️</div>
+    <div class="envlope-wrapper" id="envWrapper">
+      <div id="envelope" class="close">
+        <div class="front flap"></div>
+        <div class="front pocket"></div>
+        <div class="seal-heart"></div>
+        <div class="letter">
+          <div class="message">
+            <p>Teruntuk<br>Kamuuu 🥳</p>
+          </div>
+        </div>
+        <div class="hearts">
+          <div class="heart a1"></div>
+          <div class="heart a2"></div>
+          <div class="heart a3"></div>
+        </div>
+      </div>
     </div>
     <button class="open-btn" id="openBtn">Buka <span>💌</span></button>
   </section>
 
-  <!-- SCENE 2 : letter slides out -->
-  <section class="scene" id="scene-letter">
-    <div class="letter-wrap" id="letterWrap">
-      <div class="letter-paper" id="letterPaper">Teruntuk<br>Kamuuu 🥳</div>
-      <span class="deco-heart" id="decoHeart1" style="top:-9px; left:6%; font-size:1.15rem; animation-delay:0.35s, 0.95s;">❤️</span>
-      <span class="deco-heart" id="decoHeart2" style="top:-14px; left:40%; font-size:1.3rem; animation-delay:0.5s, 1.1s;">❤️</span>
-      <span class="deco-heart" id="decoHeart3" style="top:1px; right:0%; font-size:1.6rem; animation-delay:0.65s, 1.25s;">❤️</span>
-      <div class="env-pocket">
-        <div class="flap-shape"></div>
-        <div class="big-heart">❤️</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SCENE 3 : photo + caption -->
+  <!-- SCENE 2 : Photo Reveal -->
   <section class="scene" id="scene-photo">
     <div class="photo-frame" id="photoFrame">
       <img id="photoImg" src="https://feeldreams.github.io/emawh.gif"/>
@@ -337,7 +370,7 @@
     <div class="photo-caption">Happy Birthday.! &lt;3</div>
   </section>
 
-  <!-- SCENE 4 : main card -->
+  <!-- SCENE 3 : Main Card -->
   <section class="scene card-scene" id="scene-card">
     <div class="card" id="card">
       <div class="avatar-circle" id="avatar"></div>
@@ -348,34 +381,29 @@
 
 </div>
 
+<!-- FINALE OVERLAY -->
 <div id="finale">
-  <div class="cake-frame">
-    <div class="candles">🕯️🕯️🕯️🕯️🕯️🕯️🕯️</div>
-    <div class="hbd-word">
-      <span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span>&nbsp;<span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span>
-    </div>
+  <button class="close-btn" id="closeFinaleBtn" aria-label="Tutup Layar Finale">&times;</button>
+  <img src="https://htmlku.com/0/panda/ciumin.gif" alt="Cake" class="cake-frame">
+  <div class="hbd-word">
+    <span>H</span><span>A</span><span>P</span><span>P</span><span>Y</span>&nbsp;<span>B</span><span>I</span><span>R</span><span>T</span><span>H</span><span>D</span><span>A</span><span>Y</span>
   </div>
   <div class="wish-text" id="wishText">Wish you all the best! &lt;3</div>
 </div>
 
 <script>
-/* ================= KONFIGURASI — EDIT DI SINI ================= */
+/* ================= KONFIGURASI ================= */
 const NAMA_PENERIMA = "Enurrr";
-
-// Foto besar di layar amplop (lingkaran wreath)
 const FOTO_URL = "https://feeldreams.github.io/pandamuter.gif";
-
-// Foto custom di dalam kartu ucapan (avatar)
 const AVATAR_URL = "https://feeldreams.github.io/pusn2.gif";
 
-// Teks disesuaikan persis seperti rekaman di video
 const PARAGRAFS = [
    "Barakallahu fii umrik! Selamat ulang tahun karena, hari ini adalah hari ulang tahunmu 🤭 ... Selamat bertambah usia, makin sabar, kuat dan sehat selalu yaa.. 🥳",
-  "Oh yaa semangattt teruss jalani harinya yaa, jangan pernah putus asa buat mengejar impian kamu 💪 — Semoga di usia baru ini Allah datangkan kemudahan dan keberkahan penuh buatt kamuu dan jangan lupa selalu bersyukur yaa, semoga semakin taat kepadanya dan tercapai segala cita-cita kamu🤲"
+  "Oh yaa semangattt teruss jalani harinya yaa, jangan pernah putus asa buat mengejar impian kamu 💪 — Semoga di usia baru ini Allah datangkan kemudahan dan keberkahan penuh buatt kamuu dan jangan lupa selalu bersyukur yaa, semoga semakin taat kepadanya dan tercapai segala cita-cita kamu..Aamiin 🤲"
 ];
 const PENUTUP = "Sekali lagi 😁,\nHappy Birthday 🎉 — And ...\nWish You All The Best! 🥳";
 
-const MUSIC_URL = "https://feeldreams.github.io/audio/foreveryoung.mp3";
+const MUSIC_URL = "https://feeldreams.github.io/audio/angelbaby.mp3";
 /* ================================================================= */
 
 const bgm = document.getElementById('bgm');
@@ -420,25 +448,15 @@ function renderAvatar(url){
     img.src = url;
     img.alt = 'foto';
     avatarEl.appendChild(img);
-  } else {
-    const ph = document.createElement('div');
-    ph.className = 'placeholder-txt';
-    ph.innerHTML = 'Foto<br>Kamu';
-    avatarEl.appendChild(ph);
-    const badge = document.createElement('span');
-    badge.className = 'badge';
-    badge.textContent = '💗';
-    avatarEl.appendChild(badge);
   }
 }
 renderAvatar(AVATAR_URL);
 
-// Render Foto Besar
 if(FOTO_URL){
   document.getElementById('photoImg').src = FOTO_URL;
 }
 
-/* ============ realistic night-city canvas (matches reference video) ============ */
+/* ============ Canvas Background ============ */
 (function drawCity(){
   const canvas = document.getElementById('cityCanvas');
   const ctx = canvas.getContext('2d');
@@ -459,7 +477,6 @@ if(FOTO_URL){
 
     const rand = seeded(1337);
 
-    /* --- distant hazy hill silhouette (furthest layer) --- */
     ctx.fillStyle = 'rgba(35,28,58,0.55)';
     ctx.beginPath();
     ctx.moveTo(0,H*0.42);
@@ -469,14 +486,12 @@ if(FOTO_URL){
     }
     ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
 
-    /* --- soft haze band above horizon (sky glow of the city) --- */
     const haze = ctx.createLinearGradient(0,H*0.18,0,H*0.5);
     haze.addColorStop(0,'rgba(200,150,170,0)');
     haze.addColorStop(1,'rgba(255,190,150,0.22)');
     ctx.fillStyle = haze;
     ctx.fillRect(0,H*0.18,W,H*0.32);
 
-    /* --- mid hill / built-up silhouette --- */
     ctx.fillStyle = 'rgba(22,17,38,0.85)';
     ctx.beginPath();
     ctx.moveTo(0,H*0.62);
@@ -486,7 +501,6 @@ if(FOTO_URL){
     }
     ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
 
-    /* --- scattered warm city-light bokeh, denser near the base --- */
     const lightColors = [
       'rgba(255,214,150,ALPHA)',
       'rgba(255,180,120,ALPHA)',
@@ -512,7 +526,6 @@ if(FOTO_URL){
     }
     ctx.shadowBlur = 0;
 
-    /* --- foreground silhouette (closest, darkest) --- */
     ctx.fillStyle = 'rgba(12,9,22,0.92)';
     ctx.beginPath();
     ctx.moveTo(0,H*0.82);
@@ -521,22 +534,6 @@ if(FOTO_URL){
       ctx.lineTo(x,y);
     }
     ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.fill();
-
-    /* --- bright foreground bokeh dots (like close streetlights) --- */
-    for(let i=0;i<50;i++){
-      const x = rand()*W;
-      const y = H*0.85 + rand()*H*0.14;
-      const size = (1.2 + rand()*2.2) * DPR;
-      const alpha = 0.5 + rand()*0.4;
-      const c = `rgba(255,205,140,${alpha.toFixed(2)})`;
-      ctx.beginPath();
-      ctx.fillStyle = c;
-      ctx.shadowColor = c;
-      ctx.shadowBlur = size*5;
-      ctx.arc(x,y,size,0,Math.PI*2);
-      ctx.fill();
-    }
-    ctx.shadowBlur = 0;
   }
 
   render();
@@ -548,27 +545,20 @@ if(FOTO_URL){
 })();
 
 const bg = document.getElementById('bg');
-function spawnBubble(type){
+function spawnBubble(){
   const b = document.createElement('div');
-  b.className = 'bubble' + (type==='balloon' ? ' balloon' : '');
-  if(type==='balloon'){
-    b.textContent = '🎈';
-  } else {
-    const size = 20 + Math.random()*70;
-    b.style.width = size+'px';
-    b.style.height = size+'px';
-  }
+  b.className = 'bubble';
+  const size = 20 + Math.random()*70;
+  b.style.width = size+'px';
+  b.style.height = size+'px';
   b.style.left = Math.random()*100+'%';
   b.style.setProperty('--drift', (Math.random()*70-35)+'px');
   b.style.animationDuration = (10+Math.random()*8)+'s';
   bg.appendChild(b);
   setTimeout(()=>b.remove(), 20000);
 }
-for(let i=0;i<12;i++){
-  setTimeout(()=>spawnBubble('circle'), i*420);
-}
-setInterval(()=>spawnBubble('circle'), 1700);
-let balloonInterval = null;
+for(let i=0;i<12;i++){ setTimeout(()=>spawnBubble(), i*420); }
+setInterval(()=>spawnBubble(), 1700);
 
 function showScene(id){
   document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
@@ -576,6 +566,7 @@ function showScene(id){
 }
 const sleep = ms => new Promise(r=>setTimeout(r, ms));
 
+const envWrapper = document.getElementById('envWrapper');
 const envelope = document.getElementById('envelope');
 const openBtn = document.getElementById('openBtn');
 let started = false;
@@ -588,32 +579,21 @@ async function openEnvelope(){
   openBtn.style.opacity = '0';
   openBtn.style.pointerEvents = 'none';
 
+  envelope.classList.remove('close');
   envelope.classList.add('open');
   
-  await sleep(800);
-  showScene('scene-letter');
-  
-  const wrap = document.getElementById('letterWrap');
-  const hearts = ['❤️','💕','💖'];
-  for(let i=0;i<6;i++){
-    const h = document.createElement('span');
-    h.className='flying-heart';
-    h.textContent = hearts[i % hearts.length];
-    h.style.left = (14 + Math.random()*140)+'px';
-    h.style.bottom = (70 + Math.random()*40)+'px';
-    h.style.animationDelay = (0.9 + i*0.15)+'s';
-    wrap.appendChild(h);
-  }
-  await sleep(2400);
-
+  await sleep(1200);
   showScene('scene-photo');
-  await sleep(1750);
+  
+  await sleep(2200);
 
   showScene('scene-card');
   revealMusic();
+  
+  await sleep(600);
   await runTyping();
 }
-envelope.addEventListener('click', openEnvelope);
+envWrapper.addEventListener('click', openEnvelope);
 openBtn.addEventListener('click', openEnvelope);
 
 function typeInto(container, text, speed, wrapTag, scrollTarget){
@@ -641,19 +621,21 @@ function typeInto(container, text, speed, wrapTag, scrollTarget){
 
 const titleLine = document.getElementById('titleLine');
 const msgBox = document.getElementById('msgBox');
-const card = document.getElementById('card');
-const finale = document.getElementById('finale');
 
 async function runTyping(){
+  titleLine.innerHTML = '';
+  msgBox.innerHTML = '';
+
   const titleCursor = document.createElement('span');
   titleCursor.className = 'cursor';
   titleLine.appendChild(titleCursor);
 
-  await typeInto(titleLine, 'Happy Birthday, ', 24, 'span');
-  await typeInto(titleLine, NAMA_PENERIMA, 30, 'em');
-  await typeInto(titleLine, ' ~🫶🏻🤍💫', 24, 'span');
+  await typeInto(titleLine, 'Happy Birthday, ', 28, 'span');
+  await typeInto(titleLine, NAMA_PENERIMA, 35, 'em');
+  await typeInto(titleLine, ' 🫶🏻', 28, 'span');
   titleCursor.remove();
-  await sleep(320);
+  
+  await sleep(500);
 
   for(let p=0; p<PARAGRAFS.length; p++){
     const para = document.createElement('p');
@@ -661,9 +643,9 @@ async function runTyping(){
     cursor.className = 'cursor';
     msgBox.appendChild(para);
     para.appendChild(cursor);
-    await typeInto(para, PARAGRAFS[p], 15, 'span', msgBox);
+    await typeInto(para, PARAGRAFS[p], 18, 'span', msgBox);
     cursor.remove();
-    await sleep(380);
+    await sleep(600);
   }
 
   const closing = document.createElement('p');
@@ -672,28 +654,18 @@ async function runTyping(){
   closingCursor.className = 'cursor';
   msgBox.appendChild(closing);
   closing.appendChild(closingCursor);
-  await typeInto(closing, PENUTUP, 20, 'span', msgBox);
+  await typeInto(closing, PENUTUP, 22, 'span', msgBox);
   closingCursor.remove();
 
-  await sleep(300);
-  msgBox.scrollTop = msgBox.scrollHeight;
-
-  await sleep(650);
-  await playFinale();
+  await sleep(2200);
+  document.getElementById('finale').classList.add('show');
 }
 
-async function playFinale(){
-  card.classList.add('dim');
-  finale.classList.add('show');
-  await sleep(3200);
-  finale.classList.remove('show');
-  await sleep(550);
-  card.classList.remove('dim');
-  if(!balloonInterval){
-    balloonInterval = setInterval(()=>spawnBubble('balloon'), 1200);
-    for(let i=0;i<4;i++) setTimeout(()=>spawnBubble('balloon'), i*320);
-  }
-}
+/* Tombol Silang (X): Langsung kembali ke Scene 3 (Kartu Ucapan) */
+document.getElementById('closeFinaleBtn').addEventListener('click', ()=>{
+  document.getElementById('finale').classList.remove('show');
+  showScene('scene-card');
+});
 </script>
 </body>
 </html>
