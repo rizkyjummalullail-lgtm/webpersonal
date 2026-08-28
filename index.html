@@ -81,7 +81,7 @@
   .home-btn:active { transform: scale(0.9); }
   .home-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ============ Love Burst Effect ============ */
+  /* ============ Love Burst Effect (Envelope) ============ */
   .floating-heart {
     position: fixed;
     pointer-events: none;
@@ -100,6 +100,33 @@
     }
     100% {
       transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.3) rotate(var(--rot));
+      opacity: 0;
+    }
+  }
+
+  /* ============ Finale Love Rain Effect (Looping) ============ */
+  .finale-heart {
+    position: absolute;
+    bottom: -40px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    animation: finaleHeartRise linear forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes finaleHeartRise {
+    0% {
+      transform: translateY(0) scale(0.6) rotate(0deg);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.9;
+    }
+    85% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-110vh) scale(1.2) rotate(var(--rot));
       opacity: 0;
     }
   }
@@ -199,7 +226,7 @@
   }
   #envelope .letter .message p{
     font-family: 'Dancing Script', cursive;
-    font-weight: 400;
+    font-weight: 700;
     color: #d81b60;
     font-size: 1.55rem;
     line-height: 1.3;
@@ -334,16 +361,18 @@
 
   /* ---- Finale Overlay ---- */
   #finale{
-    position:fixed; inset:0; z-index:100; /* Diubah ke 100 agar berada di atas tombol home (z-index 99) */
+    position:fixed; inset:0; z-index:100;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:20px; background:rgba(6,4,16,0.85);
-    backdrop-filter:blur(10px); /* Efek blur untuk memburamkan latar belakang termasuk tombol home */
+    backdrop-filter:blur(10px);
     opacity:0; pointer-events:none;
     transition:opacity 0.8s var(--ease);
+    overflow:hidden;
   }
   #finale.show{ opacity:1; pointer-events:auto; }
   
   .cake-frame{
+    position:relative; z-index:2;
     border:3px solid #fff; border-radius:16px; padding:12px;
     background:#0b0b0b; box-shadow:0 0 40px rgba(255,120,180,0.6);
     transform:scale(0.5); transition:transform 0.8s var(--ease);
@@ -351,12 +380,13 @@
   }
   #finale.show .cake-frame{ transform:scale(1); }
   
-  .hbd-word{ font-weight:800; font-size:1.15rem; margin-top:6px; letter-spacing:1px; }
+  .hbd-word{ position:relative; z-index:2; font-weight:800; font-size:1.15rem; margin-top:6px; letter-spacing:1px; }
   .hbd-word span{ display:inline-block; }
   .hbd-word span:nth-child(4n+1){color:#ff5f96;} .hbd-word span:nth-child(4n+2){color:#ffd36e;}
   .hbd-word span:nth-child(4n+3){color:#7ee0a8;} .hbd-word span:nth-child(4n){color:#ff8f5f;}
   
   .wish-text{
+    position:relative; z-index:2;
     font-family: 'Dancing Script', cursive;
     font-size:2.2rem; color:#f4eefc;
     text-shadow:0 0 18px rgba(255,150,190,0.85);
@@ -447,7 +477,7 @@
       <div class="avatar-circle" id="avatar"></div>
       <h2 class="title-line" id="titleLine"></h2>
       <div class="msg-box" id="msgBox"></div>
-      <button class="show-finale-btn" id="showFinaleBtn">Lihat Kembali Foto</button>
+      <button class="show-finale-btn" id="showFinaleBtn">Lihat Kembali foto</button>
     </div>
   </section>
 
@@ -638,7 +668,7 @@ function showScene(id){
 }
 const sleep = ms => new Promise(r=>setTimeout(r, ms));
 
-/* ============ Function Love Burst Effect ============ */
+/* ============ Function Love Burst Effect (Amplop) ============ */
 function createHeartBurst(){
   const envelopeEl = document.getElementById('envelope');
   const rect = envelopeEl.getBoundingClientRect();
@@ -668,6 +698,49 @@ function createHeartBurst(){
     document.body.appendChild(heart);
     setTimeout(() => heart.remove(), 2400);
   }
+}
+
+/* ============ Function Looping Love Rain Effect (Scene Final) ============ */
+let finaleHeartInterval = null;
+
+function spawnFinaleHeart(){
+  const finaleOverlay = document.getElementById('finale');
+  if(!finaleOverlay.classList.contains('show')) return;
+
+  const heart = document.createElement('div');
+  heart.className = 'finale-heart';
+  const heartEmojis = ['❤️', '💖', '💗', '💓', '💕', '✨', '🌸', '💘'];
+  heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+  const startX = Math.random() * 100;
+  const fontSize = 16 + Math.random() * 26;
+  const duration = 3 + Math.random() * 3.5;
+  const rot = (Math.random() - 0.5) * 60;
+
+  heart.style.left = `${startX}%`;
+  heart.style.fontSize = `${fontSize}px`;
+  heart.style.animationDuration = `${duration}s`;
+  heart.style.setProperty('--rot', `${rot}deg`);
+
+  finaleOverlay.appendChild(heart);
+  setTimeout(() => heart.remove(), duration * 1000);
+}
+
+function startFinaleHeartRain(){
+  stopFinaleHeartRain();
+  // Spawn love dari bawah ke atas secara berkala
+  for(let i=0; i<6; i++){
+    setTimeout(spawnFinaleHeart, i * 250);
+  }
+  finaleHeartInterval = setInterval(spawnFinaleHeart, 350);
+}
+
+function stopFinaleHeartRain(){
+  if(finaleHeartInterval){
+    clearInterval(finaleHeartInterval);
+    finaleHeartInterval = null;
+  }
+  document.querySelectorAll('.finale-heart').forEach(h => h.remove());
 }
 
 const envWrapper = document.getElementById('envWrapper');
@@ -766,6 +839,7 @@ async function runTyping(){
 
   await sleep(2200);
   document.getElementById('finale').classList.add('show');
+  startFinaleHeartRain();
   
   showFinaleBtn.style.display = 'inline-flex';
 }
@@ -773,12 +847,14 @@ async function runTyping(){
 /* Tombol Silang (X): Langsung kembali ke Scene 3 (Kartu Ucapan) */
 document.getElementById('closeFinaleBtn').addEventListener('click', ()=>{
   document.getElementById('finale').classList.remove('show');
+  stopFinaleHeartRain();
   showScene('scene-card');
 });
 
 /* Tombol "Lihat Kembali Final 🥳": Membuka kembali finale dari Scene 3 */
 showFinaleBtn.addEventListener('click', ()=>{
   document.getElementById('finale').classList.add('show');
+  startFinaleHeartRain();
 });
 
 /* Tombol Home: Keluar / Memuat Ulang Web */
