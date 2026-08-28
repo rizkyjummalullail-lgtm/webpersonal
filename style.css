@@ -1,0 +1,414 @@
+:root{
+  --accent:#ff2e7e;
+  --accent-dark:#c22a63;
+  --gold:#ffd36e;
+  --text-light:#f4eefc;
+  --text-dim:#cfc6e6;
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{
+  margin:0; padding:0; height:100%;
+  font-family:'Handlee', cursive;
+  background:#0f0c22;
+  color:var(--text-light);
+  overflow:hidden;
+}
+
+/* ============ Persistent Background ============ */
+#bg{
+  position:fixed; inset:0; z-index:0;
+  background:linear-gradient(180deg,#241d47 0%, #473a72 40%, #6b5a9e 70%, #b895ac 100%);
+  overflow:hidden;
+}
+#bg .city-glow{
+  position:absolute; bottom:0; left:0; width:100%; height:46%;
+  background:linear-gradient(180deg, transparent 0%, rgba(255,175,120,0.10) 55%, rgba(255,190,140,0.16) 100%);
+  pointer-events:none;
+}
+#cityCanvas{
+  position:absolute; bottom:0; left:0; width:100%; height:44%;
+  display:block;
+}
+.bubble{
+  position:absolute; bottom:-60px; border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.32);
+  animation:float-up linear infinite;
+  pointer-events:none;
+  will-change:transform, opacity;
+  transform:translate3d(0,0,0);
+}
+@keyframes float-up{
+  0%{ transform:translate3d(0,0,0) rotate(0deg); opacity:0; }
+  8%{ opacity:0.8; }
+  92%{ opacity:0.45; }
+  100%{ transform:translate3d(var(--drift,20px),-118vh,0) rotate(8deg); opacity:0; }
+}
+
+/* ============ Global Home Button ============ */
+.home-btn {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+  z-index: 99;
+  backdrop-filter: blur(4px);
+}
+.home-btn:hover { background: rgba(255, 46, 126, 0.6); transform: scale(1.05); }
+.home-btn:active { transform: scale(0.9); }
+.home-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ============ Love Burst Effect (Envelope) ============ */
+.floating-heart {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  user-select: none;
+  animation: heartFloatFade 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: transform, opacity;
+}
+@keyframes heartFloatFade {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.3) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+/* ============ Finale Love Rain Effect (Looping) ============ */
+.finale-heart {
+  position: absolute;
+  bottom: -40px;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  animation: finaleHeartRise linear forwards;
+  will-change: transform, opacity;
+}
+@keyframes finaleHeartRise {
+  0% {
+    transform: translateY(0) scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-110vh) scale(1.2) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+/* ============ Stage & Scenes ============ */
+#stage{ position:fixed; inset:0; z-index:1; }
+.scene{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column;
+  opacity:0; pointer-events:none;
+  transform:scale(0.96) translateY(14px);
+  transition:opacity 0.85s var(--ease), transform 0.85s var(--ease);
+  will-change:opacity, transform;
+  padding:24px;
+  text-align:center;
+}
+.scene.active{ opacity:1; pointer-events:auto; transform:scale(1) translateY(0); }
+
+/* ---- Scene 1: Envelope ---- */
+.envlope-wrapper{
+  position: relative;
+  cursor: pointer;
+  animation: bob 3.4s ease-in-out infinite, env-intro 0.8s var(--ease) both;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+@keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+@keyframes env-intro{ 0%{ opacity:0; transform:scale(0.75) translateY(24px);} 100%{ opacity:1; transform:scale(1) translateY(0);} }
+
+#envelope{
+  width: 290px;
+  height: 185px;
+  position: relative;
+  background: #ffb3c6;
+  border-radius: 8px 8px 12px 12px;
+  box-shadow: 0 12px 30px rgba(255,46,126,0.35);
+  transform-style: preserve-3d;
+}
+#envelope.close .front.flap{
+  transform: rotateX(0deg);
+  transition: transform 0.5s ease, z-index 0.5s;
+  z-index: 10;
+}
+#envelope.open .front.flap{
+  transform: rotateX(180deg);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  z-index: 1;
+}
+#envelope .front{
+  position: absolute;
+  width: 0; height: 0;
+  z-index: 3;
+}
+#envelope .front.flap{
+  border-left: 145px solid transparent;
+  border-right: 145px solid transparent;
+  border-top: 110px solid #ff2e7e;
+  top: 0; left: 0;
+  transform-origin: top;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+#envelope.open .letter{
+  transform: translateY(-90px) scale(1);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
+  z-index: 5;
+}
+#envelope .front.pocket{
+  border-left: 145px solid #ffa3b8;
+  border-right: 145px solid #ffa3b8;
+  border-bottom: 98px solid #ff809c;
+  border-top: 87px solid transparent;
+  bottom: 0; left: 0;
+  border-radius: 0 0 12px 12px;
+}
+#envelope .letter{
+  position: absolute;
+  background: #ffffff;
+  width: 88%;
+  height: 85%;
+  top: 7%;
+  left: 6%;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 15px;
+  transform: translateY(0) scale(0.95);
+  transition: transform 0.5s ease;
+}
+#envelope .letter .message p{
+  font-family: 'Handlee', cursive;
+  font-weight: 400;
+  color: #d81b60;
+  font-size: 1.55rem;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.seal-heart {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  background: #e0115f;
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 11;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  transition: opacity 0.3s ease;
+}
+.seal-heart::before, .seal-heart::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: #e0115f;
+  border-radius: 50%;
+}
+.seal-heart::before { top: -15px; left: 0; }
+.seal-heart::after { top: 0; left: -15px; }
+
+#envelope.open .seal-heart { opacity: 0; }
+
+.hearts { position: absolute; inset: 0; pointer-events: none; z-index: 11; }
+.heart {
+  position: absolute; width: 15px; height: 15px; background: #ff2e7e;
+  transform: rotate(45deg); opacity: 0;
+}
+.heart::before, .heart::after {
+  content: ''; position: absolute; width: 15px; height: 15px; background: #ff2e7e; border-radius: 50%;
+}
+.heart::before { top: -7.5px; left: 0; }
+.heart::after { top: 0; left: -7.5px; }
+.heart.a1 { top: -10px; left: -20px; animation: hb 1.5s infinite; }
+.heart.a2 { top: -20px; right: -20px; animation: hb 1.8s infinite 0.3s; }
+.heart.a3 { bottom: 10px; left: -25px; animation: hb 1.2s infinite 0.6s; }
+@keyframes hb { 0%,100%{transform: scale(0.8) rotate(45deg); opacity:0.7;} 50%{transform: scale(1.25) rotate(45deg); opacity:1;} }
+
+.open-btn{
+  font-family: 'Handlee', cursive;
+  font-weight: 600; font-size: 1.1rem;
+  color: #ffffff;
+  background: #d81b60;
+  border: 2px solid #ffffff;
+  padding: 8px 28px; border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(216, 27, 96, 0.45); cursor: pointer;
+  display: flex; align-items: center; gap: 8px; margin-top: 15px;
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+.open-btn:active{ transform: scale(0.94); }
+
+/* Tombol Lihat Finale di Scene 3 */
+.show-finale-btn{
+  font-family: 'Handlee', cursive;
+  font-weight: 600; font-size: 1rem;
+  color: #ffffff;
+  background: #d81b60;
+  border: 2px solid #ffffff;
+  padding: 8px 22px; border-radius: 999px;
+  box-shadow: 0 4px 15px rgba(216, 27, 96, 0.4); cursor: pointer;
+  display: none; align-items: center; justify-content: center; gap: 6px;
+  margin: 14px auto 0;
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
+}
+.show-finale-btn:active{ transform: scale(0.94); }
+
+/* ---- Scene 2: Photo Reveal ---- */
+.photo-frame{
+  width:180px; height:180px; border-radius:50%;
+  background:#eaeaea; position:relative;
+  border:6px solid #fff;
+  box-shadow:0 0 30px rgba(255,120,180,0.7);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  animation:pop-in 0.85s cubic-bezier(.3,1.4,.5,1) both;
+}
+@keyframes pop-in{ 0%{ transform:scale(0.55); opacity:0;} 100%{ transform:scale(1); opacity:1;} }
+.photo-frame img{ width:100%; height:100%; object-fit:cover; }
+.photo-caption{
+  margin-top:22px;
+  font-family: 'Handlee', cursive;
+  font-size:2.3rem; color:var(--text-light);
+  text-shadow:0 0 16px rgba(255,150,190,0.8);
+  transform:rotate(-4deg) translateY(8px);
+  opacity:0; animation:cap-fade 1s var(--ease) 0.4s forwards;
+}
+@keyframes cap-fade{ to{ opacity:1; transform:rotate(-4deg) translateY(0); } }
+
+/* ---- Scene 3: Card ---- */
+.card-scene{ justify-content:flex-start; padding-top:8vh; }
+.card{
+  width:100%; max-width:390px;
+  background:rgba(50,42,80,0.60);
+  backdrop-filter:blur(8px);
+  border:2px solid rgba(255,255,255,0.9);
+  border-radius:22px;
+  padding:24px 20px;
+  box-shadow:0 0 40px rgba(255,120,180,0.25);
+  transition:opacity 0.6s var(--ease), filter 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+.avatar-circle{
+  width:90px; height:90px; border-radius:50%; margin:0 auto 14px;
+  border:4px solid rgba(255,255,255,0.9);
+  box-shadow:0 0 25px rgba(255,120,180,0.6);
+  position:relative; overflow:hidden;
+  background:linear-gradient(160deg,#efe6f5,#dcc9e6);
+  display:flex; align-items:center; justify-content:center;
+}
+.avatar-circle img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.title-line{ font-family:'Handlee', cursive; font-size:1.4rem; font-weight:700; margin:0 0 12px; text-align:left; min-height:1.4em; }
+.title-line em{ color:var(--gold); font-style:normal; }
+
+.msg-box{
+  font-family:'Handlee', cursive;
+  text-align:left; font-size:1.1rem; line-height:1.6;
+  max-height:36vh; overflow-y:auto; scrollbar-width:none;
+}
+.msg-box::-webkit-scrollbar{ display:none; }
+.msg-box p{ margin:0 0 12px; white-space:pre-wrap; }
+.msg-box p.closing{ font-weight:700; font-style:italic; }
+.cursor{ display:inline-block; width:2px; height:1em; background:var(--text-light); margin-left:2px; vertical-align:-0.15em; animation:blink 0.9s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+/* ---- Finale Overlay ---- */
+#finale{
+  position:fixed; inset:0; z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:20px; background:rgba(6,4,16,0.85);
+  backdrop-filter:blur(10px);
+  opacity:0; pointer-events:none;
+  transition:opacity 0.8s var(--ease);
+  overflow:hidden;
+}
+#finale.show{ opacity:1; pointer-events:auto; }
+
+.cake-frame{
+  position:relative; z-index:2;
+  border:3px solid #fff; border-radius:16px; padding:12px;
+  background:#0b0b0b; box-shadow:0 0 40px rgba(255,120,180,0.6);
+  transform:scale(0.5); transition:transform 0.8s var(--ease);
+  width: 200px; height: auto; object-fit: cover;
+}
+#finale.show .cake-frame{ transform:scale(1); }
+
+.hbd-word{ position:relative; z-index:2; font-family:'Handlee', cursive; font-weight:800; font-size:1.3rem; margin-top:6px; letter-spacing:1px; }
+.hbd-word span{ display:inline-block; }
+.hbd-word span:nth-child(4n+1){color:#ff5f96;} .hbd-word span:nth-child(4n+2){color:#ffd36e;}
+.hbd-word span:nth-child(4n+3){color:#7ee0a8;} .hbd-word span:nth-child(4n){color:#ff8f5f;}
+
+.wish-text{
+  position:relative; z-index:2;
+  font-family: 'Handlee', cursive;
+  font-size:2.2rem; color:#f4eefc;
+  text-shadow:0 0 18px rgba(255,150,190,0.85);
+  opacity:0; transform:translateY(12px);
+  transition:opacity 0.7s var(--ease) 0.35s, transform 0.7s var(--ease) 0.35s;
+}
+#finale.show .wish-text{ opacity:1; transform:translateY(0); }
+
+/* Tombol Silang (X) */
+.close-btn {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: background 0.3s ease, transform 0.2s ease;
+  z-index: 12;
+}
+.close-btn:hover { background: rgba(255, 46, 126, 0.6); }
+.close-btn:active { transform: scale(0.9); }
+
+@media (prefers-reduced-motion: reduce){
+  .bubble, .envlope-wrapper{ animation:none !important; }
+}
